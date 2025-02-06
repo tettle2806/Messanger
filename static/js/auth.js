@@ -1,108 +1,83 @@
-document.addEventListener('DOMContentLoaded', () => {
-  const loginEmailInput = document.getElementById('login-email');
-  const loginPasswordInput = document.getElementById('login-password');
-  const loginButton = document.getElementById('login-button');
-  const registerEmailInput = document.getElementById('register-email');
-  const registerNameInput = document.getElementById('register-name');
-  const registerPasswordInput = document.getElementById('register-password');
-  const registerConfirmPasswordInput = document.getElementById('register-confirm-password');
-  const registerButton = document.getElementById('register-button');
-  const messagesDiv = document.getElementById('messages');
-  const messageInput = document.getElementById('message-input');
-  const sendButton = document.getElementById('send-button');
-  const chatContainer = document.getElementById('chat-container');
+// Обработка кликов по вкладкам
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => showTab(tab.dataset.tab));
+});
 
-  let username = null; // Store the username after login/registration
+// Функция отображения выбранной вкладки
+function showTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
 
-  // Tab functionality
-  const tabButtons = document.querySelectorAll('.tab-button');
-  const tabContents = document.querySelectorAll('.tab-content');
+    document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`${tabName}Form`).classList.add('active');
+}
 
-  tabButtons.forEach(button => {
-    button.addEventListener('click', () => {
-      // Deactivate all tabs and content
-      tabButtons.forEach(btn => btn.classList.remove('active'));
-      tabContents.forEach(content => content.classList.remove('active'));
+// Функция для валидации данных формы
+const validateForm = fields => fields.every(field => field.trim() !== '');
 
-      // Activate the clicked tab and content
-      button.classList.add('active');
-      const tabId = button.getAttribute('data-tab');
-      document.getElementById(tabId).classList.add('active');
-    });
-  });
-
-  registerButton.addEventListener('click', async () => {
-    const email = registerEmailInput.value;
-    const name = registerNameInput.value;
-    const password = registerPasswordInput.value;
-    const confirmPassword = registerConfirmPasswordInput.value;
-
-    // Basic client-side validation
-    if (!email || !name || !password || !confirmPassword) {
-      alert('Please fill in all fields.');
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      alert('Passwords do not match.');
-      return;
-    }
-
+// Функция для отправки запросов
+const sendRequest = async (url, data) => {
     try {
-      // Simulate successful registration
-      // In a real application, you would send this data to a backend server
-      // and handle errors properly.
-      console.log('Registration successful:', { email, name, password });
-      alert('Registration successful! Please log in.');
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(result.message || 'Операция выполнена успешно!');
+            return result;
+        } else {
+            alert(result.message || 'Ошибка выполнения запроса!');
+            return null;
+        }
     } catch (error) {
-      console.error('Registration failed:', error);
-      alert('Registration failed. Please try again.');
+        console.error("Ошибка:", error);
+        alert('Произошла ошибка на сервере');
     }
-  });
+};
 
-  loginButton.addEventListener('click', async () => {
-    const emailValue = loginEmailInput.value;
-    const password = loginPasswordInput.value;
-
-    // Basic client-side validation
-    if (!emailValue || !password) {
-      alert('Please enter an email and password.');
-      return;
+// Функция для обработки формы
+const handleFormSubmit = async (formType, url, fields) => {
+    if (!validateForm(fields)) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
     }
 
-    try {
-      // Simulate successful login
-      // In a real application, you would send this data to a backend server
-      // and handle errors properly.
-      console.log('Login successful:', { email: emailValue, password });
-      username = emailValue; // Store the username (email in this case)
-      document.getElementById('login').style.display = 'none';
-      document.getElementById('register').style.display = 'none';
-      document.querySelector('.tabs').style.display = 'none';
-      chatContainer.style.display = 'flex';
-    } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please try again.');
+    const data = await sendRequest(url, formType === 'login'
+        ? {email: fields[0], password: fields[1]}
+        : {email: fields[0], name: fields[1], password: fields[2], password_check: fields[3]});
+
+    if (data && formType === 'login') {
+        window.location.href = '/chat';
     }
-  });
+};
 
-  sendButton.addEventListener('click', () => {
-    const messageText = messageInput.value;
+// Обработка формы входа
+document.getElementById('loginButton').addEventListener('click', async (event) => {
+    event.preventDefault();
 
-    if (!messageText) {
-      return;
+    const email = document.querySelector('#loginForm input[type="email"]').value;
+    const password = document.querySelector('#loginForm input[type="password"]').value;
+
+    await handleFormSubmit('login', 'login/', [email, password]);
+});
+
+// Обработка формы регистрации
+document.getElementById('registerButton').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const email = document.querySelector('#registerForm input[type="email"]').value;
+    const name = document.querySelector('#registerForm input[type="text"]').value;
+    const password = document.querySelectorAll('#registerForm input[type="password"]')[0].value;
+    const password_check = document.querySelectorAll('#registerForm input[type="password"]')[1].value;
+
+    if (password !== password_check) {
+        alert('Пароли не совпадают.');
+        return;
     }
 
-    // Simulate sending a message
-    const messageElement = document.createElement('div');
-    messageElement.classList.add('message');
-    messageElement.textContent = `${username}: ${messageText}`;
-    messagesDiv.appendChild(messageElement);
-
-    // Clear the input field
-    messageInput.value = '';
-
-    // Scroll to the bottom of the messages
-    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-  });
+    await handleFormSubmit('register', 'register/', [email, name, password, password_check]);
 });

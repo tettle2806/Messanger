@@ -1,76 +1,71 @@
 body {
-  font-family: sans-serif;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
-#app {
-  width: 80%;
-  max-width: 600px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+.container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    width: 300px;
 }
 
 .tabs {
-  display: flex;
-  margin-bottom: 10px;
+    display: flex;
 }
 
-.tab-button {
-  padding: 10px 20px;
-  border: 1px solid #666;
-  background-color: #555;
-  cursor: pointer;
-  border-radius: 4px 4px 0 0;
-  border-bottom: none;
+.tab {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-.tab-button.active {
-  background-color: #555;
+.tab.active {
+    background-color: white;
+    font-weight: bold;
 }
 
-.tab-content {
-  display: none;
-  flex-direction: column;
-  gap: 10px;
+.content {
+    padding: 20px;
 }
 
-.tab-content.active {
-  display: flex;
+.form {
+    display: none;
 }
 
-input, button {
-  padding: 10px;
-  border-radius: 4px;
-  border: 1px solid #ccc;
+.form.active {
+    display: block;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
 }
 
 button {
-  background-color: #007bff;
-  color: #555555;
-  cursor: pointer;
-  border: none;
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-  background-color: #0056b3;
-}
-
-#messages {
-  border: 1px solid #ccc;
-  padding: 10px;
-  height: 300px;
-  overflow-y: scroll;
-}
-
-.message {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
+    background-color: #0056b3;
 }

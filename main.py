@@ -4,6 +4,7 @@ from fastapi.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 from exceptions import TokenExpiredException, TokenNoFoundException
 from users.router import router as users_router
@@ -11,6 +12,9 @@ from users.router import router as users_router
 # from chat.router import router as chat_router
 
 app = FastAPI()
+
+templates = Jinja2Templates(directory='templates')
+
 app.mount('/static', StaticFiles(directory='static'), name='static')
 
 app.add_middleware(

@@ -1,16 +1,20 @@
 import os
+
+from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
+import dotenv
+
+class Settings:
+    load_dotenv()  # Load environment variables from .env file
+    ALGORITHM: str = os.getenv("ALGORITHM")
+    SECRET_KEY: str = os.getenv("SECRET_KEY")
 
 
-class Settings(BaseSettings):
-    SECRET_KEY: str
-    ALGORITHM: str
-    model_config = SettingsConfigDict(
-        env_file=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".env")
-    )
+
 
 
 settings = Settings()
+print(settings.ALGORITHM)
 
 
 def get_auth_data():

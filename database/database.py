@@ -1,7 +1,7 @@
 from sqlalchemy import func
 from datetime import datetime
 from sqlalchemy.orm import DeclarativeBase, mapped_column, Mapped
-from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 
 database_url = "postgresql+asyncpg://postgres:postgres@localhost:5432/messanger"
 engine = create_async_engine(url=database_url, echo=True)

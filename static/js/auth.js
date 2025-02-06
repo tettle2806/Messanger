@@ -1,180 +1,83 @@
-// Сохраняем текущий выбранный userId и WebSocket соединение
-let selectedUserId = null;
-let socket = null;
-let messagePollingInterval = null;
+// Обработка кликов по вкладкам
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => showTab(tab.dataset.tab));
+});
 
-// Функция выхода из аккаунта
-async function logout() {
+// Функция отображения выбранной вкладки
+function showTab(tabName) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+
+    document.querySelector(`.tab[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`${tabName}Form`).classList.add('active');
+}
+
+// Функция для валидации данных формы
+const validateForm = fields => fields.every(field => field.trim() !== '');
+
+// Функция для отправки запросов
+const sendRequest = async (url, data) => {
     try {
-        const response = await fetch('/auth/logout', {
-            method: 'POST',
-            credentials: 'include'
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(data)
         });
+
+        const result = await response.json();
 
         if (response.ok) {
-            window.location.href = '/auth';
+            alert(result.message || 'Операция выполнена успешно!');
+            return result;
         } else {
-            console.error('Ошибка при выходе');
+            alert(result.message || 'Ошибка выполнения запроса!');
+            return null;
         }
     } catch (error) {
-        console.error('Ошибка при выполнении запроса:', error);
-    }
-}
-
-// Функция выбора пользователя
-async function selectUser(userId, userName, event) {
-    selectedUserId = userId;
-    document.getElementById('chatHeader').innerHTML = `<span>Чат с ${userName}</span><button class="logout-button" id="logoutButton">Выход</button>`;
-    document.getElementById('messageInput').disabled = false;
-    document.getElementById('sendButton').disabled = false;
-
-    document.querySelectorAll('.user-item').forEach(item => item.classList.remove('active'));
-    event.target.classList.add('active');
-
-    const messagesContainer = document.getElementById('messages');
-    messagesContainer.innerHTML = '';
-    messagesContainer.style.display = 'block';
-
-    document.getElementById('logoutButton').onclick = logout;
-
-    await loadMessages(userId);
-    connectWebSocket();
-    startMessagePolling(userId);
-}
-
-// Загрузка сообщений
-async function loadMessages(userId) {
-    try {
-        const response = await fetch(`/chat/messages/${userId}`);
-        const messages = await response.json();
-
-        const messagesContainer = document.getElementById('messages');
-        messagesContainer.innerHTML = messages.map(message =>
-            createMessageElement(message.content, message.recipient_id)
-        ).join('');
-    } catch (error) {
-        console.error('Ошибка загрузки сообщений:', error);
-    }
-}
-
-// Подключение WebSocket
-function connectWebSocket() {
-    if (socket) socket.close();
-
-    socket = new WebSocket(`wss://${window.location.host}/chat/ws/${selectedUserId}`);
-
-    socket.onopen = () => console.log('WebSocket соединение установлено');
-
-    socket.onmessage = (event) => {
-        const incomingMessage = JSON.parse(event.data);
-        if (incomingMessage.recipient_id === selectedUserId) {
-            addMessage(incomingMessage.content, incomingMessage.recipient_id);
-        }
-    };
-
-    socket.onclose = () => console.log('WebSocket соединение закрыто');
-}
-
-// Отправка сообщения
-async function sendMessage() {
-    const messageInput = document.getElementById('messageInput');
-    const message = messageInput.value.trim();
-
-    if (message && selectedUserId) {
-        const payload = {recipient_id: selectedUserId, content: message};
-
-        try {
-            await fetch('/chat/messages', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
-            });
-
-            socket.send(JSON.stringify(payload));
-            addMessage(message, selectedUserId);
-            messageInput.value = '';
-        } catch (error) {
-            console.error('Ошибка при отправке сообщения:', error);
-        }
-    }
-}
-
-// Добавление сообщения в чат
-function addMessage(text, recipient_id) {
-    const messagesContainer = document.getElementById('messages');
-    messagesContainer.insertAdjacentHTML('beforeend', createMessageElement(text, recipient_id));
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Создание HTML элемента сообщения
-function createMessageElement(text, recipient_id) {
-    const userID = parseInt(selectedUserId, 10);
-    const messageClass = userID === recipient_id ? 'my-message' : 'other-message';
-    return `<div class="message ${messageClass}">${text}</div>`;
-}
-
-// Запуск опроса новых сообщений
-function startMessagePolling(userId) {
-    clearInterval(messagePollingInterval);
-    messagePollingInterval = setInterval(() => loadMessages(userId), 1000);
-}
-
-// Обработка нажатий на пользователя
-function addUserClickListeners() {
-    document.querySelectorAll('.user-item').forEach(item => {
-        item.onclick = event => selectUser(item.getAttribute('data-user-id'), item.textContent, event);
-    });
-}
-
-// Первоначальная настройка событий нажатия на пользователей
-addUserClickListeners();
-
-// Обновление списка пользователей
-async function fetchUsers() {
-    try {
-        const response = await fetch('/auth/users');
-        const users = await response.json();
-        const userList = document.getElementById('userList');
-
-        // Очищаем текущий список пользователей
-        userList.innerHTML = '';
-
-        // Создаем элемент "Избранное" для текущего пользователя
-        const favoriteElement = document.createElement('div');
-        favoriteElement.classList.add('user-item');
-        favoriteElement.setAttribute('data-user-id', currentUserId);
-        favoriteElement.textContent = 'Избранное';
-
-        // Добавляем "Избранное" в начало списка
-        userList.appendChild(favoriteElement);
-
-        // Генерация списка остальных пользователей
-        users.forEach(user => {
-            if (user.id !== currentUserId) {
-                const userElement = document.createElement('div');
-                userElement.classList.add('user-item');
-                userElement.setAttribute('data-user-id', user.id);
-                userElement.textContent = user.name;
-                userList.appendChild(userElement);
-            }
-        });
-
-        // Повторно добавляем обработчики событий для каждого пользователя
-        addUserClickListeners();
-    } catch (error) {
-        console.error('Ошибка при загрузке списка пользователей:', error);
-    }
-}
-
-
-document.addEventListener('DOMContentLoaded', fetchUsers);
-setInterval(fetchUsers, 10000); // Обновление каждые 10 секунд
-
-// Обработчики для кнопки отправки и ввода сообщения
-document.getElementById('sendButton').onclick = sendMessage;
-
-document.getElementById('messageInput').onkeypress = async (e) => {
-    if (e.key === 'Enter') {
-        await sendMessage();
+        console.error("Ошибка:", error);
+        alert('Произошла ошибка на сервере');
     }
 };
+
+// Функция для обработки формы
+const handleFormSubmit = async (formType, url, fields) => {
+    if (!validateForm(fields)) {
+        alert('Пожалуйста, заполните все поля.');
+        return;
+    }
+
+    const data = await sendRequest(url, formType === 'login'
+        ? {email: fields[0], password: fields[1]}
+        : {email: fields[0], name: fields[1], password: fields[2], password_check: fields[3]});
+
+    if (data && formType === 'login') {
+        window.location.href = '/chat';
+    }
+};
+
+// Обработка формы входа
+document.getElementById('loginButton').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const email = document.querySelector('#loginForm input[type="email"]').value;
+    const password = document.querySelector('#loginForm input[type="password"]').value;
+
+    await handleFormSubmit('login', 'login/', [email, password]);
+});
+
+// Обработка формы регистрации
+document.getElementById('registerButton').addEventListener('click', async (event) => {
+    event.preventDefault();
+
+    const email = document.querySelector('#registerForm input[type="email"]').value;
+    const name = document.querySelector('#registerForm input[type="text"]').value;
+    const password = document.querySelectorAll('#registerForm input[type="password"]')[0].value;
+    const password_check = document.querySelectorAll('#registerForm input[type="password"]')[1].value;
+
+    if (password !== password_check) {
+        alert('Пароли не совпадают.');
+        return;
+    }
+
+    await handleFormSubmit('register', 'register/', [email, name, password, password_check]);
+});

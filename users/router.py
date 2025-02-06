@@ -13,7 +13,7 @@ from users.dao import UsersDAO
 from users.schemas import SUserRegister, SUserAuth
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
-from schemas import SUserRead
+from users.schemas import SUserRead
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 

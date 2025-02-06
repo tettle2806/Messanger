@@ -25,10 +25,10 @@ async def get_chat_page(request: Request, user_data: User = Depends(get_current_
 
 
 @router.websocket("/messages/{user_id}")
-async def get_messages(user_uuid: UUID, current_user: User = Depends(get_current_user)):
+async def get_messages(user_uuid: int, current_user: User = Depends(get_current_user)):
     return (
         await MessagesDAO.get_messages_between_users(
-            user_id_1=user_uuid, user_id_2=current_user.uuid
+            user_id_1=user_uuid, user_id_2=current_user.int
         )
         or []
     )
@@ -40,19 +40,19 @@ async def send_message(
 ):
     # Add new message to the database
     await MessagesDAO.add(
-        sender_id=current_user.uuid,
+        sender_id=current_user.id,
         content=message.content,
         recipient_id=message.recipient_id,
     )
     # Подготавливаем данные для отправки сообщения
     message_data = {
-        "sender_id": current_user.uuid,
+        "sender_id": current_user.id,
         "recipient_id": message.recipient_id,
         "content": message.content,
     }
     # Уведомляем получателя и отправителя через WebSocket
     await notify_user(message.recipient_id, message_data)
-    await notify_user(current_user.uuid, message_data)
+    await notify_user(current_user.id, message_data)
 
     # Возвращаем подтверждение сохранения сообщения
     return {
@@ -68,7 +68,7 @@ active_connections: Dict[UUID, WebSocket] = {}
 
 
 # Функция для отправки сообщения пользователю, если он подключен
-async def notify_user(user_id: UUID, message: dict):
+async def notify_user(user_id: id, message: dict):
     """Отправить сообщение пользователю, если он подключен."""
     if user_id in active_connections:
         websocket = active_connections[user_id]
@@ -78,7 +78,7 @@ async def notify_user(user_id: UUID, message: dict):
 
 # WebSocket эндпоинт для соединений
 @router.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: UUID):
+async def websocket_endpoint(websocket: WebSocket, user_id: int):
     # Принимаем WebSocket-соединение
     await websocket.accept()
     # Сохраняем активное соединение для пользователя

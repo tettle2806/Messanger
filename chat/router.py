@@ -11,43 +11,56 @@ import asyncio
 import logging
 from sqlalchemy import UUID
 
-router = APIRouter(prefix='/chat', tags=['Chat'])
-templates = Jinja2Templates(directory='templates')
+router = APIRouter(prefix="/chat", tags=["Chat"])
+templates = Jinja2Templates(directory="templates")
 
 
 # Страница чата
 @router.get("/", response_class=HTMLResponse, summary="Chat Page")
 async def get_chat_page(request: Request, user_data: User = Depends(get_current_user)):
     users_all = await UsersDAO.find_all()
-    return templates.TemplateResponse("chat.html",
-                                      {"request": request, "user": user_data, 'users_all': users_all})
+    return templates.TemplateResponse(
+        "chat.html", {"request": request, "user": user_data, "users_all": users_all}
+    )
 
 
 @router.websocket("/messages/{user_id}")
-async def get_messages(user_uuid:UUID, current_user:User = Depends(get_current_user)):
-    return await MessagesDAO.get_messages_between_users(user_id_1=user_uuid, user_id_2=current_user.uuid) or []
+async def get_messages(user_uuid: UUID, current_user: User = Depends(get_current_user)):
+    return (
+        await MessagesDAO.get_messages_between_users(
+            user_id_1=user_uuid, user_id_2=current_user.uuid
+        )
+        or []
+    )
 
 
 @router.post("/messages", response_model=MessageCreate)
-async def send_message(message: MessageCreate, current_user: User = Depends(get_current_user)):
+async def send_message(
+    message: MessageCreate, current_user: User = Depends(get_current_user)
+):
     # Add new message to the database
     await MessagesDAO.add(
         sender_id=current_user.uuid,
         content=message.content,
-        recipient_id=message.recipient_id
+        recipient_id=message.recipient_id,
     )
     # Подготавливаем данные для отправки сообщения
     message_data = {
-        'sender_id': current_user.uuid,
-        'recipient_id': message.recipient_id,
-        'content': message.content,
+        "sender_id": current_user.uuid,
+        "recipient_id": message.recipient_id,
+        "content": message.content,
     }
     # Уведомляем получателя и отправителя через WebSocket
     await notify_user(message.recipient_id, message_data)
     await notify_user(current_user.uuid, message_data)
 
     # Возвращаем подтверждение сохранения сообщения
-    return {'recipient_id': message.recipient_id, 'content': message.content, 'status': 'ok', 'msg': 'Message saved!'}
+    return {
+        "recipient_id": message.recipient_id,
+        "content": message.content,
+        "status": "ok",
+        "msg": "Message saved!",
+    }
 
 
 # Активные WebSocket-подключения: {user_id: websocket}

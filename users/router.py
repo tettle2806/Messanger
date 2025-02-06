@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Response
 from starlette.templating import Jinja2Templates
 
@@ -11,10 +13,18 @@ from users.dao import UsersDAO
 from users.schemas import SUserRegister, SUserAuth
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
+from schemas import SUserRead
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 templates = Jinja2Templates(directory="templates")
+
+
+@router.get("/users", response_model=List[SUserRead])
+async def get_users():
+    users_all = await UsersDAO.find_all()
+    # Используем генераторное выражение для создания списка
+    return [{"id": user.id, "name": user.name} for user in users_all]
 
 
 @router.get("/", response_class=HTMLResponse, summary="Страница авторизации")

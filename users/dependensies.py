@@ -2,7 +2,7 @@ from fastapi import Request, HTTPException, status, Depends
 from jose import jwt, JWTError
 from datetime import datetime, timezone
 from config import get_auth_data
-from exeptions import TokenExpiredException, NoJwtException, NoUserIdException, TokenNoFoundException
+from exceptions import TokenExpiredException, NoJwtException, NoUserIdException, TokenNoFoundException
 from users.dao import UsersDAO
 
 

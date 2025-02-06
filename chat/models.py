@@ -4,7 +4,7 @@ from database.database import Base
 
 
 class Message(Base):
-    __tablename__ = 'messages'
+    __tablename__ = "messages"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
     sender_id: Mapped[UUID] = mapped_column(UUID, ForeignKey("users.uuid"))

@@ -1,0 +1,158 @@
+body {
+  font-family: sans-serif;
+  background-color: #222; /* Dark background */
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.chat-container {
+  display: flex;
+  width: 80%;
+  max-width: 1200px;
+  height: 80vh;
+  background-color: #333; /* Darker chat container */
+  border-radius: 15px; /* Rounded edges */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+  overflow: hidden; /* Clip content to rounded borders */
+}
+
+/* User List Styles */
+.user-list {
+  width: 30%;
+  background-color: #444; /* Darker user list */
+  border-right: 1px solid #555;
+  padding: 20px;
+  color: #eee; /* Light text color */
+}
+
+.user-list h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  font-size: 1.2em;
+  color: #fff; /* White heading */
+}
+
+.user-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-list li {
+  padding: 10px;
+  border-bottom: 1px solid #555;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.user-list li:hover {
+  background-color: #555;
+}
+
+/* Chat Window Styles */
+.chat-window {
+  width: 70%;
+  display: flex;
+  flex-direction: column;
+  background-color: #333; /* Dark chat window */
+}
+
+#chat-header {
+  padding: 15px;
+  background-color: #444; /* Darker header */
+  border-bottom: 1px solid #555;
+  font-weight: bold;
+  color: #eee; /* Light header text */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+#chat-messages {
+  flex-grow: 1;
+  padding: 20px;
+  overflow-y: auto;
+  position: relative;
+  color: #ddd; /* Light message text */
+}
+
+.message {
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  clear: both;
+}
+
+.message.sent {
+  background-color: #007bff; /* Blue sent messages */
+  color: white;
+  float: right;
+}
+
+.message.received {
+  background-color: #555; /* Dark received messages */
+  color: #eee;
+  float: left;
+  border: 1px solid #666;
+}
+
+.chat-input {
+  padding: 15px;
+  border-top: 1px solid #555;
+  display: flex;
+  background-color: #444; /* Dark input area */
+}
+
+.chat-input input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  margin-right: 10px;
+  background-color: #555;
+  color: #eee;
+}
+
+.chat-input button {
+  padding: 10px 15px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.chat-input button:hover {
+  background-color: #0056b3;
+}
+
+/* Styles for the initial message */
+.initial-message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.5em;
+  color: #888;
+  text-align: center;
+}
+
+/* Logout button styles */
+#logout-button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  position: static; /* Remove fixed positioning */
+  margin-left: auto; /* Push to the right */
+}
+
+#logout-button:hover {
+  background-color: #0056b3;
+}

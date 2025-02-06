@@ -1,10 +1,41 @@
-<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мини-чат: Вход и Регистрация</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+  <div id="app">
+    <div class="tabs">
+      <button class="tab-button active" data-tab="login">Авторизация</button>
+      <button class="tab-button" data-tab="register">Регистрация</button>
+    </div>
+
+    <div id="login" class="tab-content active">
+      <h1>Login</h1>
+      <input type="email" id="login-email" placeholder="Email">
+      <input type="password" id="login-password" placeholder="Password">
+      <button id="login-button">Войти</button>
+    </div>
+
+    <div id="register" class="tab-content">
+      <h1>Register</h1>
+      <input type="email" id="register-email" placeholder="Email">
+      <input type="text" id="register-name" placeholder="Name">
+      <input type="password" id="register-password" placeholder="Password">
+      <input type="password" id="register-confirm-password" placeholder="Confirm Password">
+      <button id="register-button">Зарегистрироваться</button>
+    </div>
+
+    <div id="chat-container" style="display: none;">
+      <div id="messages"></div>
+      <input type="text" id="message-input" placeholder="Type a message...">
+      <button id="send-button">Send</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
 </body>
 </html>

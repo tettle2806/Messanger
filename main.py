@@ -4,8 +4,10 @@ from fastapi.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
 from exceptions import TokenExpiredException, TokenNoFoundException
 from users.router import router as users_router
+
 # from chat.router import router as chat_router
 
 app = FastAPI()

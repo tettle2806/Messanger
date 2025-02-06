@@ -1,13 +1,20 @@
 from fastapi import APIRouter, Response
-from fastapi.requests import Request
-from fastapi.responses import HTMLResponse
+
 from exceptions import UserAlreadyExistsException, IncorrectEmailOrPasswordException, PasswordMismatchException
 from users.auth import get_password_hash, authenticate_user, create_access_token
 from users.dao import UsersDAO
 from users.schemas import SUserRegister, SUserAuth
+from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
+from fastapi.responses import HTMLResponse
 
+templates = Jinja2Templates(directory='Messanger/templates')
 router = APIRouter(prefix='/auth', tags=['Auth'])
 
+
+@router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
+async def get_categories(request: Request):
+    return templates.TemplateResponse("auth.html", {"request": request})
 
 @router.post("/register/")
 async def register_user(user_data: SUserRegister) -> dict:

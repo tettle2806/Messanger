@@ -4,7 +4,6 @@ from fastapi.responses import RedirectResponse
 from fastapi.exceptions import HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
 
 from exceptions import TokenExpiredException, TokenNoFoundException
 from users.router import router as users_router
@@ -13,13 +12,14 @@ from users.router import router as users_router
 
 app = FastAPI()
 
-templates = Jinja2Templates(directory='templates')
 
-app.mount('/static', StaticFiles(directory='static'), name='static')
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Разрешить запросы с любых источников. Можете ограничить список доменов
+    allow_origins=[
+        "*"
+    ],  # Разрешить запросы с любых источников. Можете ограничить список доменов
     allow_credentials=True,
     allow_methods=["*"],  # Разрешить все методы (GET, POST, PUT, DELETE и т.д.)
     allow_headers=["*"],  # Разрешить все заголовки
@@ -45,7 +45,6 @@ async def token_expired_exception_handler(request: Request, exc: HTTPException):
 async def token_no_found_exception_handler(request: Request, exc: HTTPException):
     # Возвращаем редирект на страницу /auth
     return RedirectResponse(url="/auth")
-
 
 
 if __name__ == "__main__":

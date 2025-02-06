@@ -4,13 +4,11 @@ from dotenv import load_dotenv
 from pydantic_settings import BaseSettings, SettingsConfigDict
 import dotenv
 
+
 class Settings:
     load_dotenv()  # Load environment variables from .env file
     ALGORITHM: str = os.getenv("ALGORITHM")
     SECRET_KEY: str = os.getenv("SECRET_KEY")
-
-
-
 
 
 settings = Settings()

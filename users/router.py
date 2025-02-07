@@ -24,7 +24,7 @@ templates = Jinja2Templates(directory="templates")
 async def get_users():
     users_all = await UsersDAO.find_all()
     # Используем генераторное выражение для создания списка
-    return [{"id": user.id, "name": user.name} for user in users_all]
+    return [{"id": user.id, "name": user.username} for user in users_all]
 
 
 @router.get("/", response_class=HTMLResponse, summary="Страница авторизации")
@@ -53,7 +53,7 @@ async def auth_user(response: Response, user_data: SUserAuth):
     check = await authenticate_user(email=user_data.email, password=user_data.password)
     if check is None:
         raise IncorrectEmailOrPasswordException
-    access_token = create_access_token({"sub": str(check.uuid)})
+    access_token = create_access_token({"sub": str(check.id)})
     response.set_cookie(key="users_access_token", value=access_token, httponly=True)
     return {
         "ok": True,
